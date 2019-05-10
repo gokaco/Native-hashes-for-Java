@@ -44,13 +44,13 @@ public class Sha1 extends BlockHasher {
 		for (int i = 0; i < 8; i++){
 			@SuppressWarnings("signedness")
 			@Unsigned byte k= (byte)(length >>> (i * 8));
-			block[block.length - 1 + i] = k;
+			block[block.length - 1 - i] = k;
 		}
 		compress(block, 0, block.length);
 		
 		@Unsigned byte[] result = new byte[state.length * 4];
 		for (int i = 0; i < result.length; i++)
-			result[i] = (byte)(state[i / 4] >>> (24- i % 4 * 8));
+			result[i] = (byte)(state[i / 4] >>> (24 - i % 4 * 8));
 		return result;
 	}
 	

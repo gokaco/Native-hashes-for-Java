@@ -8,11 +8,12 @@
 package nayuki.nativehash;
 
 import java.util.Arrays;
+import org.checkerframework.checker.signedness.qual.*;
 
 
 public class Sha1 extends BlockHasher {
 	
-	protected int[] state;
+	protected @Unsigned int[] state;
 	
 	
 	
@@ -23,14 +24,16 @@ public class Sha1 extends BlockHasher {
 	
 	
 	
-	protected void compress(byte[] msg, int off, int len) {
+	protected void compress(@Unsigned byte[] msg, int off, int len) {
 		if (!compress(state, msg, off, len))
 			throw new RuntimeException("Native call failed");
 	}
 	
 	
-	protected byte[] getHashDestructively() {
-		block[blockFilled] = (byte)0x80;
+	protected @Unsigned byte[] getHashDestructively() {
+		@SuppressWarnings("value")
+		@Unsigned byte b=(byte)0x80;
+		block[blockFilled] = b;
 		blockFilled++;
 		Arrays.fill(block, blockFilled, block.length, (byte)0);
 		if (blockFilled + 8 > block.length) {
@@ -38,18 +41,21 @@ public class Sha1 extends BlockHasher {
 			Arrays.fill(block, (byte)0);
 		}
 		length = length << 3;
-		for (int i = 0; i < 8; i++)
-			block[block.length - 1 - i] = (byte)(length >>> (i * 8));
+		for (int i = 0; i < 8; i++){
+			@SuppressWarnings("signedness")
+			@Unsigned byte k= (byte)(length >>> (i * 8));
+			block[block.length - 1 + i] = k;
+		}
 		compress(block, 0, block.length);
 		
-		byte[] result = new byte[state.length * 4];
+		@Unsigned byte[] result = new byte[state.length * 4];
 		for (int i = 0; i < result.length; i++)
-			result[i] = (byte)(state[i / 4] >>> (24 - i % 4 * 8));
+			result[i] = (byte)(state[i / 4] >>> (24- i % 4 * 8));
 		return result;
 	}
 	
 	
-	private static native boolean compress(int[] state, byte[] msg, int off, int len);
+	private static native boolean compress(@Unsigned int[] state, @Unsigned byte[] msg, int off, int len);
 	
 	
 	static {

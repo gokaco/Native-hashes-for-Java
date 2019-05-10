@@ -12,7 +12,9 @@ public class Tiger2 extends Tiger {
 	
 	public Tiger2() {
 		super();
-		padding = (byte)0x80;
+		@SuppressWarnings("value")
+		byte b= (byte)0x80;
+		padding = b;
 	}
 	
 }

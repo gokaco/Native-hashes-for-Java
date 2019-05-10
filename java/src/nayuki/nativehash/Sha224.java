@@ -8,6 +8,7 @@
 package nayuki.nativehash;
 
 import java.util.Arrays;
+import org.checkerframework.checker.signedness.qual.*;
 
 
 public class Sha224 extends Sha256 {
@@ -19,7 +20,7 @@ public class Sha224 extends Sha256 {
 	
 	
 	
-	protected byte[] getHashDestructively() {
+	protected @Unsigned byte[] getHashDestructively() {
 		return Arrays.copyOf(super.getHashDestructively(), 28);
 	}
 	

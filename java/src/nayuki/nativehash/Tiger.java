@@ -8,12 +8,13 @@
 package nayuki.nativehash;
 
 import java.util.Arrays;
+import org.checkerframework.checker.signedness.qual.*;
 
 
 public class Tiger extends BlockHasher {
 	
-	protected long[] state;
-	protected byte padding;
+	protected @Unsigned long[] state;
+	protected @Unsigned byte padding;
 	
 	
 	
@@ -25,13 +26,13 @@ public class Tiger extends BlockHasher {
 	
 	
 	
-	protected void compress(byte[] msg, int off, int len) {
+	protected void compress(@Unsigned byte[] msg, int off, int len) {
 		if (!compress(state, msg, off, len))
 			throw new RuntimeException("Native call failed");
 	}
 	
 	
-	protected byte[] getHashDestructively() {
+	protected @Unsigned byte[] getHashDestructively() {
 		block[blockFilled] = padding;
 		blockFilled++;
 		Arrays.fill(block, blockFilled, block.length, (byte)0);
@@ -40,18 +41,21 @@ public class Tiger extends BlockHasher {
 			Arrays.fill(block, (byte)0);
 		}
 		length = length << 3;
-		for (int i = 0; i < 8; i++)
-			block[block.length - 8 + i] = (byte)(length >>> (i * 8));
+		for (int i = 0; i < 8; i++){
+			@SuppressWarnings("signedness")
+			@Unsigned byte k= (byte)(length >>> (i * 8));
+			block[block.length - 8 + i] = k;
+		}
 		compress(block, 0, block.length);
 		
-		byte[] result = new byte[state.length * 8];
+		@Unsigned byte[] result = new byte[state.length * 8];
 		for (int i = 0; i < result.length; i++)
 			result[i] = (byte)(state[i / 8] >>> (i % 8 * 8));
 		return result;
 	}
 	
 	
-	private static native boolean compress(long[] state, byte[] msg, int off, int len);
+	private static native boolean compress(@Unsigned long[] state, @Unsigned byte[] msg, int off, int len);
 	
 	
 	static {

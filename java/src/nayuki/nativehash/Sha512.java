@@ -44,7 +44,7 @@ public class Sha512 extends BlockHasher {
 		for (int i = 0; i < 8; i++){
 			@SuppressWarnings("signedness")
 			@Unsigned byte k= (byte)(length >>> (i * 8));
-			block[block.length - 1 + i] = k;
+			block[block.length - 1 - i] = k;
 		}
 		compress(block, 0, block.length);
 		

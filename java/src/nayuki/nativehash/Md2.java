@@ -8,12 +8,13 @@
 package nayuki.nativehash;
 
 import java.util.Arrays;
+import org.checkerframework.checker.signedness.qual.*;
 
 
 public class Md2 extends BlockHasher {
 	
-	protected byte[] state;
-	protected byte[] checksum;
+	protected @Unsigned byte[] state;
+	protected @Unsigned byte[] checksum;
 	
 	
 	
@@ -25,15 +26,18 @@ public class Md2 extends BlockHasher {
 	
 	
 	
-	protected void compress(byte[] msg, int off, int len) {
+	protected void compress(@Unsigned byte[] msg, int off, int len) {
 		if (!compress(state, checksum, msg, off, len))
 			throw new RuntimeException("Native call failed");
 	}
 	
 	
-	protected byte[] getHashDestructively() {
-		for (int i = blockFilled; i < block.length; i++)
-			block[i] = (byte)(block.length - blockFilled);
+	protected @Unsigned byte[] getHashDestructively() {
+		for (int i = blockFilled; i < block.length; i++){
+			@SuppressWarnings("signedness")
+			@Unsigned byte k=(byte)(block.length - blockFilled);
+			block[i] = k;
+		}
 		compress(block, 0, block.length);
 		
 		for (int i = 0; i < 16; i++)
@@ -44,7 +48,7 @@ public class Md2 extends BlockHasher {
 	}
 	
 	
-	private static native boolean compress(byte[] state, byte[] checksum, byte[] msg, int off, int len);
+	private static native boolean compress(@Unsigned byte[] state, @Unsigned byte[] checksum, @Unsigned byte[] msg, int off, int len);
 	
 	
 	static {

@@ -7,10 +7,11 @@
 
 package nayuki.nativehash;
 
+import org.checkerframework.checker.signedness.qual.*;
 
 public abstract class BlockHasher implements Cloneable {
 	
-	protected byte[] block;
+	protected @Unsigned byte[] block;
 	protected int blockFilled;
 	protected long length;
 	
@@ -24,19 +25,19 @@ public abstract class BlockHasher implements Cloneable {
 	
 	
 	
-	public void update(byte[] b) {
+	public void update(@Unsigned byte[] b) {
 		update(b, 0, b.length);
 	}
 	
 	
-	public void update(byte[] b, int off, int len) {
+	public void update(@Unsigned byte[] b, int off, int len) {
 		int blockLen = block.length;
-		length += len;
+		length = length+len;
 		
 		if (blockFilled > 0) {
 			int n = Math.min(blockLen - blockFilled, len);
 			System.arraycopy(b, off, block, blockFilled, n);
-			blockFilled += n;
+			blockFilled = blockFilled +n;
 			if (blockFilled == blockLen) {
 				compress(block, 0, blockLen);
 				off += n;
@@ -68,14 +69,14 @@ public abstract class BlockHasher implements Cloneable {
 	}
 	
 	
-	public byte[] getHash() {
+	public @Unsigned byte[] getHash() {
 		return clone().getHashDestructively();
 	}
 	
 	
-	protected abstract void compress(byte[] msg, int off, int len);
+	protected abstract void compress(@Unsigned byte[] msg, int off, int len);
 	
 	
-	protected abstract byte[] getHashDestructively();
+	protected abstract @Unsigned byte[] getHashDestructively();
 	
 }

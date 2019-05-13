@@ -42,6 +42,7 @@ public class Tiger extends BlockHasher {
 		}
 		length = length << 3;
 		for (int i = 0; i < 8; i++){
+			//Length is not stored as unsigned
 			@SuppressWarnings("signedness")
 			@Unsigned byte k= (byte)(length >>> (i * 8));
 			block[block.length - 8 + i] = k;

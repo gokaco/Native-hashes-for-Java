@@ -10,6 +10,7 @@ package nayuki.nativehash;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Random;
+import org.checkerframework.checker.signedness.qual.*;
 
 
 abstract class HashTest {
@@ -46,7 +47,7 @@ abstract class HashTest {
 			BlockHasher h1 = newHasher(true);
 			while (len > 0) {
 				int n = random.nextInt(len) + 1;
-				byte[] b = new byte[n];
+				@Unsigned byte[] b = new byte[n];
 				random.nextBytes(b);
 				h0.update(b);
 				h1.update(b);

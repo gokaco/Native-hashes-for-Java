@@ -34,6 +34,7 @@ public class Md2 extends BlockHasher {
 	
 	protected @Unsigned byte[] getHashDestructively() {
 		for (int i = blockFilled; i < block.length; i++){
+			//Length is not stored as unsigned
 			@SuppressWarnings("signedness")
 			@Unsigned byte k=(byte)(block.length - blockFilled);
 			block[i] = k;

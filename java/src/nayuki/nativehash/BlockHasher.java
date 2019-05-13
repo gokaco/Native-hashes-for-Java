@@ -32,7 +32,7 @@ public abstract class BlockHasher implements Cloneable {
 	
 	public void update(@Unsigned byte[] b, int off, int len) {
 		int blockLen = block.length;
-		length = length+len;
+		length = length+len;//Issue 2482
 		
 		if (blockFilled > 0) {
 			int n = Math.min(blockLen - blockFilled, len);

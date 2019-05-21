@@ -8,12 +8,13 @@
 package nayuki.nativehash;
 
 import static java.lang.Long.rotateRight;
+import org.checkerframework.checker.signedness.qual.*;
 
 
 class Sha512Java extends Sha512 {
 	
-	protected void compress(byte[] msg, int off, int len) {
-		long[] sch = new long[80];
+	protected void compress(@Unsigned byte[] msg, int off, int len) {
+		@Unsigned long[] sch = new long[80];
 		for (int i = off, end = off + len; i < end; ) {
 			for (int j = 0; j < 16; j++, i += 8) {
 				sch[j] =
@@ -30,17 +31,17 @@ class Sha512Java extends Sha512 {
 			for (int j = 16; j < 80; j++)
 				sch[j] = sch[j - 16] + sch[j - 7] + smallSigma0(sch[j - 15]) + smallSigma1(sch[j - 2]);
 			
-			long a = state[0];
-			long b = state[1];
-			long c = state[2];
-			long d = state[3];
-			long e = state[4];
-			long f = state[5];
-			long g = state[6];
-			long h = state[7];
+			@Unsigned long a = state[0];
+			@Unsigned long b = state[1];
+			@Unsigned long c = state[2];
+			@Unsigned long d = state[3];
+			@Unsigned long e = state[4];
+			@Unsigned long f = state[5];
+			@Unsigned long g = state[6];
+			@Unsigned long h = state[7];
 			for (int j = 0; j < 80; j++) {
-				long t1 = h + bigSigma1(e) + choose(e, f, g) + K[j] + sch[j];
-				long t2 = bigSigma0(a) + majority(a, b, c);
+				@Unsigned long t1 = h + bigSigma1(e) + choose(e, f, g) + K[j] + sch[j];
+				@Unsigned long t2 = bigSigma0(a) + majority(a, b, c);
 				h = g;
 				g = f;
 				f = e;
@@ -62,15 +63,15 @@ class Sha512Java extends Sha512 {
 	}
 	
 	
-	private static long smallSigma0(long x) { return rotateRight(x,  1) ^ rotateRight(x,  8) ^ (x >>> 7); }
-	private static long smallSigma1(long x) { return rotateRight(x, 19) ^ rotateRight(x, 61) ^ (x >>> 6); }
-	private static long bigSigma0  (long x) { return rotateRight(x, 28) ^ rotateRight(x, 34) ^ rotateRight(x, 39); }
-	private static long bigSigma1  (long x) { return rotateRight(x, 14) ^ rotateRight(x, 18) ^ rotateRight(x, 41); }
-	private static long choose  (long x, long y, long z) { return (x & y) ^ (~x & z);          }  // Can be optimized to z ^ (x & (y ^ z))
-	private static long majority(long x, long y, long z) { return (x & y) ^ (x & z) ^ (y & z); }  // Can be optimized to (x & (y | z)) | (y & z)
+	private static @Unsigned long smallSigma0(@Unsigned long x) { return rotateRight(x,  1) ^ rotateRight(x,  8) ^ (x >>> 7); }
+	private static @Unsigned long smallSigma1(@Unsigned long x) { return rotateRight(x, 19) ^ rotateRight(x, 61) ^ (x >>> 6); }
+	private static @Unsigned long bigSigma0  (@Unsigned long x) { return rotateRight(x, 28) ^ rotateRight(x, 34) ^ rotateRight(x, 39); }
+	private static @Unsigned long bigSigma1  (@Unsigned long x) { return rotateRight(x, 14) ^ rotateRight(x, 18) ^ rotateRight(x, 41); }
+	private static @Unsigned long choose  (@Unsigned long x, @Unsigned long y, @Unsigned long z) { return (x & y) ^ (~x & z);          }  // Can be optimized to z ^ (x & (y ^ z))
+	private static @Unsigned long majority(@Unsigned long x, @Unsigned long y, @Unsigned long z) { return (x & y) ^ (x & z) ^ (y & z); }  // Can be optimized to (x & (y | z)) | (y & z)
 	
 	
-	private static final long[] K = {
+	private static final @Unsigned long[] K = {
 		0x428A2F98D728AE22L, 0x7137449123EF65CDL, 0xB5C0FBCFEC4D3B2FL, 0xE9B5DBA58189DBBCL,
 		0x3956C25BF348B538L, 0x59F111F1B605D019L, 0x923F82A4AF194F9BL, 0xAB1C5ED5DA6D8118L,
 		0xD807AA98A3030242L, 0x12835B0145706FBEL, 0x243185BE4EE4B28CL, 0x550C7DC3D5FFB4E2L,

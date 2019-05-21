@@ -8,6 +8,7 @@
 package nayuki.nativehash;
 
 import java.util.Random;
+import org.checkerframework.checker.signedness.qual.*;
 
 
 public class BenchmarkHashes {
@@ -57,7 +58,9 @@ public class BenchmarkHashes {
 		if (args.length == 2)
 			trials = Integer.parseInt(args[1]);
 		
-		byte[] buffer = new byte[64 * 1024 * 1024];
+		@Unsigned byte[] buffer = new byte[64 * 1024 * 1024];
+		/* Cannot take parameter as unsigned.
+		   Annotation is reuired */
 		new Random().nextBytes(buffer);
 		for (BlockHasher hasher : hashers) {
 			long len = 1000;
@@ -77,12 +80,13 @@ public class BenchmarkHashes {
 	
 	
 	// Returns nanoseconds
-	private static long getTime(BlockHasher hasher, byte[] buffer, long len) {
+	private static long getTime(BlockHasher hasher, @Unsigned byte[] buffer, long len) {
 		long startTime = System.nanoTime();
 		while (len > 0) {
 			int n = (int)Math.min(len, buffer.length);
 			hasher.update(buffer, 0, n);
-			len -= n;
+			//Issue #2482
+			len = len - n;
 		}
 		return System.nanoTime() - startTime;
 	}

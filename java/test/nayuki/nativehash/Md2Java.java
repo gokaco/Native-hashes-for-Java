@@ -7,18 +7,19 @@
 
 package nayuki.nativehash;
 
+import org.checkerframework.checker.signedness.qual.*;
 
 final class Md2Java extends Md2 {
 	
-	protected void compress(byte[] msg, int off, int len) {
-		int[] state = new int[this.state.length];
-		int[] checksum = new int[this.checksum.length];
+	protected void compress(@Unsigned byte[] msg, int off, int len) {
+		@Unsigned int[] state = new int[this.state.length];
+		@Unsigned int[] checksum = new int[this.checksum.length];
 		for (int i = 0; i < state.length; i++)
 			state[i] = this.state[i] & 0xFF;
 		for (int i = 0; i < checksum.length; i++)
 			checksum[i] = this.checksum[i] & 0xFF;
 		
-		int[] message = new int[16];
+		@Unsigned int[] message = new int[16];
 		for (int i = off, end = off + len; i < end; i += 16) {
 			for (int j = 0; j < 16; j++)
 				message[j] = msg[i + j] & 0xFF;
@@ -28,16 +29,16 @@ final class Md2Java extends Md2 {
 				state[j + 32] = message[j] ^ state[j];
 			}
 			
-			int t = 0;
+			@Unsigned int t = 0;
 			for (int j = 0; j < 18; j++) {
 				for (int k = 0; k < 48; k++)
 					t = state[k] ^= SBOX[t];
 				t = (t + j) & 0xFF;
 			}
 			
-			int l = checksum[15];
+			@Unsigned int l = checksum[15];
 			for (int j = 0; j < 16; j++) {
-				int temp = checksum[j] ^ SBOX[message[j] ^ l];
+				@Unsigned int temp = checksum[j] ^ SBOX[message[j] ^ l];
 				checksum[j] = temp;
 				l = temp;
 			}
@@ -50,7 +51,7 @@ final class Md2Java extends Md2 {
 	}
 	
 	
-	private static final int[] SBOX = {
+	private static final @Unsigned int[] SBOX = {
 		0x29, 0x2E, 0x43, 0xC9, 0xA2, 0xD8, 0x7C, 0x01, 0x3D, 0x36, 0x54, 0xA1, 0xEC, 0xF0, 0x06, 0x13,
 		0x62, 0xA7, 0x05, 0xF3, 0xC0, 0xC7, 0x73, 0x8C, 0x98, 0x93, 0x2B, 0xD9, 0xBC, 0x4C, 0x82, 0xCA,
 		0x1E, 0x9B, 0x57, 0x3C, 0xFD, 0xD4, 0xE0, 0x16, 0x67, 0x42, 0x6F, 0x18, 0x8A, 0x17, 0xE5, 0x12,

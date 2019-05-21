@@ -12,6 +12,7 @@ final class Tiger2Java extends TigerJava {
 	
 	public Tiger2Java() {
 		super();
+		// Closed Issue #2367
 		padding = (byte)0x80;
 	}
 	

@@ -90,7 +90,10 @@ $(LIBFILE): $(SRC_FILES)
 	$(CC) $(CFLAGS) -shared -fPIC -o $@ $(SRC_FILES)
 
 classes: java/bin
-	cd java/src ; javac -processor signedness nayuki/nativehash/*.java
+	cd java/src ; javac -cp ../bin -d ../bin -processor signedness nayuki/nativehash/*.java
+	cd java/test; javac -cp ../bin -d ../bin -processor signedness nayuki/nativehash/*.java
+	cd java/bin ; javac -cp ../bin -d ../bin -processor signedness nayuki/nativehash/*.java
+
 
 java/bin:
 	mkdir $@

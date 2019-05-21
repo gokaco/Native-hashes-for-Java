@@ -7,11 +7,12 @@
 
 package nayuki.nativehash;
 
+import org.checkerframework.checker.signedness.qual.*;
 
 class TigerJava extends Tiger {
 	
-	protected void compress(byte[] msg, int off, int len) {
-		long[] sch = new long[8];
+	protected void compress(@Unsigned byte[] msg, int off, int len) {
+		@Unsigned long[] sch = new long[8];
 		for (int i = off, end = off + len; i < end; ) {
 			for (int j = 0; j < 8; j++, i += 8) {
 				sch[j] =
@@ -25,22 +26,23 @@ class TigerJava extends Tiger {
 					| (msg[i + 7] & 0xFFL) << 56;
 			}
 			
-			long a = state[0];
-			long b = state[1];
-			long c = state[2];
+			@Unsigned long a = state[0];
+			@Unsigned long b = state[1];
+			@Unsigned long c = state[2];
 			for (int j = 0; j < 24; j++) {
 				c ^= sch[j & 7];
-				a -= T1[(int)(c >>>  0) & 0xFF] ^
+				// Issue #2482
+				a = a - T1[(int)(c >>>  0) & 0xFF] ^
 				     T2[(int)(c >>> 16) & 0xFF] ^
 				     T3[(int)(c >>> 32) & 0xFF] ^
 				     T4[(int)(c >>> 48) & 0xFF];
-				b += T4[(int)(c >>>  8) & 0xFF] ^
+				b = b - T4[(int)(c >>>  8) & 0xFF] ^
 				     T3[(int)(c >>> 24) & 0xFF] ^
 				     T2[(int)(c >>> 40) & 0xFF] ^
 				     T1[(int)(c >>> 56) & 0xFF];
-				b *= 5 + (j >>> 3 << 1);
+				b = b * 5 + (j >>> 3 << 1);
 				
-				long temp = a;
+				@Unsigned long temp = a;
 				a = b;
 				b = c;
 				c = temp;
@@ -56,7 +58,7 @@ class TigerJava extends Tiger {
 	}
 	
 	
-	private static void keySchedule(long[] schedule) {
+	private static void keySchedule(@Unsigned long[] schedule) {
 		schedule[0] -= schedule[7] ^ 0xA5A5A5A5A5A5A5A5L;
 		schedule[1] ^= schedule[0];
 		schedule[2] += schedule[1];
@@ -76,7 +78,7 @@ class TigerJava extends Tiger {
 	}
 	
 	
-	private static long[] T1 = {
+	private static @Unsigned long[] T1 = {
 		0x02AAB17CF7E90C5EL, 0xAC424B03E243A8ECL, 0x72CD5BE30DD5FCD3L, 0x6D019B93F6F97F3AL,
 		0xCD9978FFD21F9193L, 0x7573A1C9708029E2L, 0xB164326B922A83C3L, 0x46883EEE04915870L,
 		0xEAACE3057103ECE6L, 0xC54169B808A3535CL, 0x4CE754918DDEC47CL, 0x0AA2F4DFDC0DF40CL,
@@ -144,7 +146,7 @@ class TigerJava extends Tiger {
 	};
 	
 	
-	private static long[] T2 = {
+	private static @Unsigned long[] T2 = {
 		0xE6A6BE5A05A12138L, 0xB5A122A5B4F87C98L, 0x563C6089140B6990L, 0x4C46CB2E391F5DD5L,
 		0xD932ADDBC9B79434L, 0x08EA70E42015AFF5L, 0xD765A6673E478CF1L, 0xC4FB757EAB278D99L,
 		0xDF11C6862D6E0692L, 0xDDEB84F10D7F3B16L, 0x6F2EF604A665EA04L, 0x4A8E0F0FF0E0DFB3L,
@@ -212,7 +214,7 @@ class TigerJava extends Tiger {
 	};
 	
 	
-	private static long[] T3 = {
+	private static @Unsigned long[] T3 = {
 		0xF49FCC2FF1DAF39BL, 0x487FD5C66FF29281L, 0xE8A30667FCDCA83FL, 0x2C9B4BE3D2FCCE63L,
 		0xDA3FF74B93FBBBC2L, 0x2FA165D2FE70BA66L, 0xA103E279970E93D4L, 0xBECDEC77B0E45E71L,
 		0xCFB41E723985E497L, 0xB70AAA025EF75017L, 0xD42309F03840B8E0L, 0x8EFC1AD035898579L,
@@ -280,7 +282,7 @@ class TigerJava extends Tiger {
 	};
 	
 	
-	private static long[] T4 = {
+	private static @Unsigned long[] T4 = {
 		0x5B0E608526323C55L, 0x1A46C1A9FA1B59F5L, 0xA9E245A17C4C8FFAL, 0x65CA5159DB2955D7L,
 		0x05DB0A76CE35AFC2L, 0x81EAC77EA9113D45L, 0x528EF88AB6AC0A0DL, 0xA09EA253597BE3FFL,
 		0x430DDFB3AC48CD56L, 0xC4B3A67AF45CE46FL, 0x4ECECFD8FBE2D05EL, 0x3EF56F10B39935F0L,

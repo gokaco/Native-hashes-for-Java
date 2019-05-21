@@ -48,12 +48,18 @@ abstract class HashTest {
 			while (len > 0) {
 				int n = random.nextInt(len) + 1;
 				@Unsigned byte[] b = new byte[n];
+				/*Unable to take parameter as Unsigned
+				  Annotation is needed */
 				random.nextBytes(b);
 				h0.update(b);
 				h1.update(b);
-				len -= n;
+				//Issue #2482
+				len = len-n;
 			}
-			if (!Arrays.equals(h0.getHash(), h1.getHash()))
+			//Unable to take parameters as unsigned. Needs Annotation.
+			@SuppressWarnings("signedness")
+			boolean p = !Arrays.equals(h0.getHash(), h1.getHash());
+			if (p)
 				throw new AssertionError("Native/Java hash mismatch");
 		}
 	}
@@ -62,9 +68,11 @@ abstract class HashTest {
 	public void benchmark() {
 		BlockHasher hashJava = newHasher(false);
 		BlockHasher hashNative = newHasher(true);
-		byte[] b = new byte[1 << 27];  // 128 MiB
+		@Unsigned byte[] b = new byte[1 << 27];  // 128 MiB
 		System.out.println("Block size    Java impl    Native impl");
 		while (true) {
+			/*Unable to take parameter as Unsigned
+				  Annotation is needed */
 			random.nextBytes(b);
 			for (int i = 12; i <= 27; i++) {
 				int len = 1 << i;
@@ -84,10 +92,13 @@ abstract class HashTest {
 	}
 	
 	
-	protected byte[] getHash(String msg, boolean useNative) {
+	protected @Unsigned byte[] getHash(String msg, boolean useNative) {
 		try {
 			BlockHasher h = newHasher(useNative);
-			h.update(msg.getBytes("US-ASCII"));
+			//Return type cannot be stored as Unsigned. Needs annotation.
+			@SuppressWarnings("signedness")
+			@Unsigned byte[] p= msg.getBytes("US-ASCII");
+			h.update(p);
 			return h.getHash();
 		} catch (UnsupportedEncodingException e) {
 			throw new AssertionError(e);
@@ -95,7 +106,7 @@ abstract class HashTest {
 	}
 	
 	
-	protected static String toHex(byte[] hash) {
+	protected static String toHex(@Unsigned byte[] hash) {
 		String result = "";
 		for (byte b : hash)
 			result += String.format("%02X", b & 0xFF);

@@ -39,6 +39,7 @@ final class Sha1Java extends Sha1 {
 			@Unsigned int sch15 = msg[i + 60] << 24 | (msg[i + 61] & 0xFF) << 16 | (msg[i + 62] & 0xFF) << 8 | (msg[i + 63] & 0xFF);
 			
 			@Unsigned int t;
+			// Issue #2482
 			e = e + rotateLeft(a, 5) + (d ^ (b & (c ^ d))) + sch00 + K0;  b = rotateLeft(b, 30);
 			d = d + rotateLeft(e, 5) + (c ^ (a & (b ^ c))) + sch01 + K0;  a = rotateLeft(a, 30);
 			c = c + rotateLeft(d, 5) + (b ^ (e & (a ^ b))) + sch02 + K0;  e = rotateLeft(e, 30);

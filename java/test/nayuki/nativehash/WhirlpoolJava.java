@@ -7,12 +7,13 @@
 
 package nayuki.nativehash;
 
+import org.checkerframework.checker.signedness.qual.*;
 
 final class WhirlpoolJava extends Whirlpool {
 	
-	protected void compress(byte[] msg, int off, int len) {
-		long[] tempblock = new long[8];
-		long[] tempstate = new long[8];
+	protected void compress(@Unsigned byte[] msg, int off, int len) {
+		@Unsigned long[] tempblock = new long[8];
+		@Unsigned long[] tempstate = new long[8];
 		
 		for (int i = off, end = off + len; i < end; i += 64) {
 			for (int j = 0, k = 0; j < 8; j++, k += 8) {
@@ -43,7 +44,7 @@ final class WhirlpoolJava extends Whirlpool {
 	}
 	
 	
-	private static void encrypt(long[] message, long[] key) {
+	private static void encrypt(@Unsigned long[] message, @Unsigned long[] key) {
 		for (int i = 0; i < 8; i++)
 			message[i] ^= key[i];
 		
@@ -54,9 +55,9 @@ final class WhirlpoolJava extends Whirlpool {
 	}
 	
 	
-	private static void round(long[] msg, long[] key) {
+	private static void round(@Unsigned long[] msg, @Unsigned long[] key) {
 		final int M = 0xFF;
-		long m0 = msg[0], m1 = msg[1], m2 = msg[2], m3 = msg[3], m4 = msg[4], m5 = msg[5], m6 = msg[6], m7 = msg[7];
+		@Unsigned long m0 = msg[0], m1 = msg[1], m2 = msg[2], m3 = msg[3], m4 = msg[4], m5 = msg[5], m6 = msg[6], m7 = msg[7];
 		msg[0] = MUL[(int)(m0 >>> 56)] ^ MUL[0x100 | (int)(m7 >>> 48) & M] ^ MUL[0x200 | (int)(m6 >>> 40) & M] ^ MUL[0x300 | (int)(m5 >>> 32) & M] ^ MUL[0x400 | (int)m4 >>> 24] ^ MUL[0x500 | (int)m3 >>> 16 & M] ^ MUL[0x600 | (int)m2 >>> 8 & M] ^ MUL[0x700 | (int)m1 & M] ^ key[0];
 		msg[1] = MUL[(int)(m1 >>> 56)] ^ MUL[0x100 | (int)(m0 >>> 48) & M] ^ MUL[0x200 | (int)(m7 >>> 40) & M] ^ MUL[0x300 | (int)(m6 >>> 32) & M] ^ MUL[0x400 | (int)m5 >>> 24] ^ MUL[0x500 | (int)m4 >>> 16 & M] ^ MUL[0x600 | (int)m3 >>> 8 & M] ^ MUL[0x700 | (int)m2 & M] ^ key[1];
 		msg[2] = MUL[(int)(m2 >>> 56)] ^ MUL[0x100 | (int)(m1 >>> 48) & M] ^ MUL[0x200 | (int)(m0 >>> 40) & M] ^ MUL[0x300 | (int)(m7 >>> 32) & M] ^ MUL[0x400 | (int)m6 >>> 24] ^ MUL[0x500 | (int)m5 >>> 16 & M] ^ MUL[0x600 | (int)m4 >>> 8 & M] ^ MUL[0x700 | (int)m3 & M] ^ key[2];
@@ -69,16 +70,16 @@ final class WhirlpoolJava extends Whirlpool {
 	
 	
 	private static final int ROUNDS = 10;
-	private static long[][] RCON;
-	private static long[] MUL;
+	private static @Unsigned long[][] RCON;
+	private static @Unsigned long[] MUL;
 	
 	
 	static {
 		// S-box
-		int[] SBOX = new int[256];
-		int[] e = {0x1, 0xB, 0x9, 0xC, 0xD, 0x6, 0xF, 0x3, 0xE, 0x8, 0x7, 0x4, 0xA, 0x2, 0x5, 0x0};
-		int[] r = {0x7, 0xC, 0xB, 0xD, 0xE, 0x4, 0x9, 0xF, 0x6, 0x3, 0x8, 0xA, 0x2, 0x5, 0x1, 0x0};
-		int[] einv = new int[16];
+		@Unsigned int[] SBOX = new int[256];
+		@Unsigned int[] e = {0x1, 0xB, 0x9, 0xC, 0xD, 0x6, 0xF, 0x3, 0xE, 0x8, 0x7, 0x4, 0xA, 0x2, 0x5, 0x0};
+		@Unsigned int[] r = {0x7, 0xC, 0xB, 0xD, 0xE, 0x4, 0x9, 0xF, 0x6, 0x3, 0x8, 0xA, 0x2, 0x5, 0x1, 0x0};
+		@Unsigned int[] einv = new int[16];
 		for (int i = 0; i < e.length; i++)
 			einv[e[i]] = i;
 		for (int i = 0; i < SBOX.length; i++) {
@@ -89,19 +90,20 @@ final class WhirlpoolJava extends Whirlpool {
 		}
 		
 		// Round constants
-		RCON = new long[ROUNDS][8];
+		RCON = new @Unsigned long[ROUNDS][8];
 		for (int i = 0; i < RCON.length; i++) {
 			for (int j = 0; j < 8; j++)
-				RCON[i][0] |= (long)SBOX[8 * i + j] << ((7 - j) * 8);
+				// Issue #2482
+				RCON[i][0] = RCON[i][0] | (long)SBOX[8 * i + j] << ((7 - j) * 8);
 			for (int j = 1; j < 8; j++)
 				RCON[i][j] = 0;
 		}
 		
 		// Multiplication tables
-		int[] FACTORS = {0x01, 0x01, 0x04, 0x01, 0x08, 0x05, 0x02, 0x09};  // Pseudo-reversed
+		@Unsigned int[] FACTORS = {0x01, 0x01, 0x04, 0x01, 0x08, 0x05, 0x02, 0x09};  // Pseudo-reversed
 		MUL = new long[256 * 8];
 		for (int i = 0; i < 256; i++) {
-			long vector = 0;
+			@Unsigned long vector = 0;
 			for (int j = 0; j < 8; j++)
 				vector |= multiply(SBOX[i], FACTORS[j]) << ((7 - j) * 8);
 			for (int j = 0; j < 8; j++)
@@ -110,10 +112,10 @@ final class WhirlpoolJava extends Whirlpool {
 	}
 	
 	
-	private static long multiply(int x, int y) {
+	private static @Unsigned long multiply(@Unsigned int x, @Unsigned int y) {
 		if ((x & 0xFF) != x || (y & 0xFF) != y)
 			throw new IllegalArgumentException();
-		int z = 0;
+		@Unsigned int z = 0;
 		for (; y != 0; y >>>= 1) {
 			z ^= (y & 1) * x;
 			x = (x << 1) ^ ((x >>> 7) * 0x11D);

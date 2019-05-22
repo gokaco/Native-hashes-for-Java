@@ -92,7 +92,7 @@ $(LIBFILE): $(SRC_FILES)
 classes: java/bin
 	cd java/src ; javac -cp ../bin -d ../bin -processor signedness nayuki/nativehash/*.java
 	cd java/test; javac -cp ../bin -d ../bin -processor signedness nayuki/nativehash/*.java
-	cd java/bin ; javac -cp ../bin -d ../bin -processor signedness nayuki/nativehash/*.java
+	cd java/demo ; javac -cp ../bin -d ../bin -processor signedness nayuki/nativehash/*.java
 
 
 java/bin:

@@ -12,6 +12,8 @@ public class Tiger2 extends Tiger {
 	
 	public Tiger2() {
 		super();
+		/*Cast from @IntVal(128) int" to "@IntVal(-128) byte cannot be statically verified
+		  Similar to issue #2367*/
 		@SuppressWarnings("value")
 		byte b= (byte)0x80;
 		padding = b;

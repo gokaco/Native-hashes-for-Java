@@ -48,7 +48,7 @@ abstract class HashTest {
 			while (len > 0) {
 				int n = random.nextInt(len) + 1;
 				@Unsigned byte[] b = new byte[n];
-				/*Unable to take parameter as Unsigned
+				/*nextBytes() is unable to take parameter as Unsigned
 				  Annotation is needed */
 				random.nextBytes(b);
 				h0.update(b);
@@ -56,7 +56,7 @@ abstract class HashTest {
 				//Issue #2482
 				len = len-n;
 			}
-			//Unable to take parameters as unsigned. Needs Annotation.
+			//Arrays.equals() is unable to take parameters as unsigned. Needs Annotation.
 			@SuppressWarnings("signedness")
 			boolean p = !Arrays.equals(h0.getHash(), h1.getHash());
 			if (p)
@@ -71,8 +71,8 @@ abstract class HashTest {
 		@Unsigned byte[] b = new byte[1 << 27];  // 128 MiB
 		System.out.println("Block size    Java impl    Native impl");
 		while (true) {
-			/*Unable to take parameter as Unsigned
-				  Annotation is needed */
+			/*nextBytes() is unable to take parameter as Unsigned.
+		          Annotation is needed */
 			random.nextBytes(b);
 			for (int i = 12; i <= 27; i++) {
 				int len = 1 << i;
@@ -95,7 +95,7 @@ abstract class HashTest {
 	protected @Unsigned byte[] getHash(String msg, boolean useNative) {
 		try {
 			BlockHasher h = newHasher(useNative);
-			//Return type cannot be stored as Unsigned. Needs annotation.
+			//getBytes() return type cannot be stored as unsigned. Needs annotation.
 			@SuppressWarnings("signedness")
 			@Unsigned byte[] p= msg.getBytes("US-ASCII");
 			h.update(p);

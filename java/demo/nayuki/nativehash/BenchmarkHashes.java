@@ -59,8 +59,9 @@ public class BenchmarkHashes {
 			trials = Integer.parseInt(args[1]);
 		
 		@Unsigned byte[] buffer = new byte[64 * 1024 * 1024];
-		/* Cannot take parameter as unsigned.
-		   Annotation is reuired */
+		/* nextbytes() cannot take parameter as unsigned.
+		   Here buffer needs to be unsigned but nextbytes() can take only signed.
+		   Annotation is required */
 		new Random().nextBytes(buffer);
 		for (BlockHasher hasher : hashers) {
 			long len = 1000;

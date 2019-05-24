@@ -31,7 +31,8 @@ public class Ripemd320 extends BlockHasher {
 	
 	
 	protected @Unsigned byte[] getHashDestructively() {
-		//Related to issue #2367
+		/*Cast from @IntVal(128) int" to "@IntVal(-128) byte cannot be statically verified
+		  Similar to issue #2367*/
 		@SuppressWarnings("value")
 		@Unsigned byte b=(byte)0x80;
 		block[blockFilled] = b;
@@ -43,7 +44,7 @@ public class Ripemd320 extends BlockHasher {
 		}
 		length = length << 3;
 		for (int i = 0; i < 8; i++){
-			//Length is not stored as unsigned
+			//Length cannot be stored as unsigned
 			@SuppressWarnings("signedness")
 			@Unsigned byte k= (byte)(length >>> (i * 8));
 			block[block.length - 8 + i] = k;
